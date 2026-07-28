@@ -5,7 +5,7 @@ This repository contains examples of progress indicators for shell scripts, incl
 ## 📜 Features
 - 🌀 **Spinner**: Displays a rotating spinner while a background task is running.
 - 📊 **Progress Bar**: Shows a progress bar that updates as tasks complete.
-- ✅ Both scripts run on macOS and Linux. `progress_bar.sh` is POSIX `sh` (dash, bash, zsh); `spinner.sh` requires bash.
+- ✅ Both scripts run on macOS and Linux, and both work whether you execute them or source them for their functions. `progress_bar.sh` is POSIX `sh`, verified under dash, bash and zsh; `spinner.sh` is verified under bash and zsh.
 - 🪵 Both detect whether stdout is a terminal and stay quiet in pipes and log files instead of filling them with redraw frames.
 
 ## 🚀 Usage

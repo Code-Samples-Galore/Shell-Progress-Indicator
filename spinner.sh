@@ -27,7 +27,11 @@ spinner() {
     clear_eol=$'\033[K'
 
     while kill -0 "$pid" 2>/dev/null; do
-      printf "%s[%c] %s%s" "$cr" "${spin:i++%${#spin}:1}" "$message" "$clear_eol"
+      # The offset must be wrapped in $(( )). Written bare as ${spin:i++%...},
+      # zsh reads the `:i` as a history modifier and dies with
+      # "unrecognized modifier `i'"; this form works in both shells.
+      printf "%s[%c] %s%s" \
+        "$cr" "${spin:$((i++ % ${#spin})):1}" "$message" "$clear_eol"
       sleep "$delay"
     done
   fi
@@ -45,8 +49,21 @@ spinner() {
 }
 
 # Only run the demo when executed directly, so the file can be sourced for the
-# `spinner` function alone.
-if [ "${BASH_SOURCE[0]:-}" = "$0" ]; then
+# `spinner` function alone. bash reports this through BASH_SOURCE; zsh has no
+# such variable and would otherwise skip the demo silently, so it is detected
+# via ZSH_EVAL_CONTEXT, which contains ":file" only when sourcing.
+_spinner_is_main=0
+if [ -n "${ZSH_VERSION:-}" ]; then
+  case "${ZSH_EVAL_CONTEXT:-}" in
+    *:file*) ;;
+    *) _spinner_is_main=1 ;;
+  esac
+elif [ "${BASH_SOURCE[0]:-}" = "$0" ]; then
+  _spinner_is_main=1
+fi
+
+if [ "$_spinner_is_main" -eq 1 ]; then
+  unset _spinner_is_main
   exit_ok() {
     sleep 2
     exit 0
@@ -67,3 +84,4 @@ if [ "${BASH_SOURCE[0]:-}" = "$0" ]; then
   # be misleading.
   exit 0
 fi
+unset _spinner_is_main
