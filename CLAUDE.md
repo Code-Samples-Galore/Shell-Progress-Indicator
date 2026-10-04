@@ -23,6 +23,8 @@ script -qec './progress_bar.sh' /dev/null            # TTY path: in-place redraw
 script -qec './progress_bar.sh' /dev/null | tr '\r' '\n'   # make each redraw its own line
 ```
 
+`script -qec '<cmd>' /dev/null` is the Linux (util-linux) form. On macOS the same pty run is `script -q /dev/null <cmd>`, e.g. `script -q /dev/null ./progress_bar.sh`.
+
 `progress_bar.sh` must keep working under dash, which is `/bin/sh` on Debian/Ubuntu, and both scripts must work under zsh. Check explicitly — bash accepts plenty that dash and zsh reject:
 
 ```sh
@@ -40,10 +42,10 @@ zsh -c '. ./spinner.sh; sleep 1 & spinner "$!" test'
 Note that a non-TTY spinner run **skips the animation loop entirely**, so piping it does not exercise the frame code at all. A zsh parse error there survived a full round of piped testing. Frame rendering must be checked through a pty:
 
 ```sh
-script -qec 'zsh ./spinner.sh' /dev/null | tr '\r' '\n' | grep -oP '^\[[|/\\-]\]' | sort -u
+script -qec 'zsh ./spinner.sh' /dev/null | tr '\r' '\n' | grep -oE '^\[[|/\\-]\]' | sort -u
 ```
 
-`shellcheck` and `zsh` are not installed by default here; `apt-get install -y zsh` if needed.
+If `dash`, `zsh` or `shellcheck` is missing on the machine, install it (`apt-get install -y zsh`, `brew install shellcheck`) rather than skipping that shell.
 
 ## Shell compatibility contract
 
